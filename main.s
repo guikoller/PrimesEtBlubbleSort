@@ -129,16 +129,48 @@ check_prime
 		
 	;;Numero é primo: salvar na lista
 	STRB R5, [R1], #4;
-	ADD R4, R4, #1;
+	ADD R4, R4, #1; ;Numero de primos
 	
 next_num
 	ADD R9, R9, #1; incrementa indice
 	CMP R2, R9; compara com o tamanho da lista
 	IT GT
 		BGT check_prime_loop
-	
 
-	
+; Bubble Sort
+bubble_sort
+    LDR R0, =PRIME_LIST; ;primeira posição do array
+    SUB R4, R4, #1; ;decrementa 1 do tamanho do array
+
+main_loop
+    MOV R5, #0; ; contador do loop principal
+    MOV R10, #0; ; flag swapped
+    
+loop
+    LDRB R2, [R0]; ; valor atual
+    LDRB R3, [R0, #4]; ;próximo valor
+    CMP R2, R3;
+    IT GT
+        BGT swap;
+
+    ADD R0, R0, #4; ; avança na lista
+    ADD R5, R5, #1;
+    CMP R5, R4;
+    BLT loop;
+
+    CMP R10, #0; ; check swap
+    BEQ SORTED;
+
+	LDR R0, =PRIME_LIST; ;Reinicia Array
+    B main_loop; 
+
+swap
+    STRB R2, [R0, #4]; ; Trocar os valores
+    STRB R3, [R0];
+    MOV R10, #1; ; Sinalizar que houve troca
+	B loop;
+
+SORTED
 	
 	NOP;
 	
