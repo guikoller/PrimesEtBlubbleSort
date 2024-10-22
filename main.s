@@ -4,105 +4,55 @@
 ; 12/03/2018
 
 ; -------------------------------------------------------------------------------
-        THUMB                        ; InstruÁıes do tipo Thumb-2
+        THUMB                        ; Instru√ß√µes do tipo Thumb-2
 ; -------------------------------------------------------------------------------
-; DeclaraÁıes EQU - Defines
+; Declara√ß√µes EQU - Defines
 ;<NOME>         EQU <VALOR>
 
 RANDOM_LIST		EQU		0x20000A00
 PRIME_LIST		EQU 	0x20000B00
 ; -------------------------------------------------------------------------------
-; ¡rea de Dados - DeclaraÁıes de vari·veis
+; √Årea de Dados - Declara√ß√µes de vari√°veis
 		AREA  DATA, ALIGN=2
-		; Se alguma vari·vel for chamada em outro arquivo
-		;EXPORT  <var> [DATA,SIZE=<tam>]   ; Permite chamar a vari·vel <var> a 
+		; Se alguma vari√°vel for chamada em outro arquivo
+		;EXPORT  <var> [DATA,SIZE=<tam>]   ; Permite chamar a vari√°vel <var> a 
 		                                   ; partir de outro arquivo
-;<var>	SPACE <tam>                        ; Declara uma vari·vel de nome <var>
+;<var>	SPACE <tam>                        ; Declara uma vari√°vel de nome <var>
                                            ; de <tam> bytes a partir da primeira 
-                                           ; posiÁ„o da RAM		
+                                           ; posi√ß√£o da RAM		
 
 ; -------------------------------------------------------------------------------
-; ¡rea de CÛdigo - Tudo abaixo da diretiva a seguir ser· armazenado na memÛria de 
-;                  cÛdigo
+; √Årea de C√≥digo - Tudo abaixo da diretiva a seguir ser√° armazenado na mem√≥ria de 
+;                  c√≥digo
         AREA    |.text|, CODE, READONLY, ALIGN=2
 
-		; Se alguma funÁ„o do arquivo for chamada em outro arquivo	
-        EXPORT Start                ; Permite chamar a funÁ„o Start a partir de 
+		; Se alguma fun√ß√£o do arquivo for chamada em outro arquivo	
+        EXPORT Start                ; Permite chamar a fun√ß√£o Start a partir de 
 			                        ; outro arquivo. No caso startup.s
 									
-		; Se chamar alguma funÁ„o externa	
+		; Se chamar alguma fun√ß√£o externa	
         ;IMPORT <func>              ; Permite chamar dentro deste arquivo uma 
-									; funÁ„o <func>
+									; fun√ß√£o <func>
 
 ; -------------------------------------------------------------------------------
-; FunÁ„o main()
+; Fun√ß√£o main()
 Start  
-; Comece o cÛdigo aqui <======================================================
-
-    LDR R0, =RANDOM_LIST; ;ponteiro para lista original
+; Comece o c√≥digo aqui <======================================================
+    
+	LDR R0, =RANDOM_LIST; ;ponteiro para lista original
 	LDR R1, =PRIME_LIST; ; ponteiro para lista de primos
-	MOV R2, #20;		;TAM
+	MOV R2, #0;		;TAM
+	LDR R3, =array1
+
+loadlist	
+	LDRB R4, [R3], #1;
+	STRB R4, [R0], #1;
 	
-loadlist
-	MOV R3, #193;
-	STRB R3, [R0], #4;
+	CMP R4, #0;
+	ITT NE
+		ADDNE R2, R2, #1;
+		BNE loadlist;
 	
-	MOV R3, #63;
-	STRB R3, [R0], #4;
-	
-	MOV R3, #176;
-	STRB R3, [R0], #4;
-	
-	MOV R3, #127;
-	STRB R3, [R0], #4;
-	
-	MOV R3, #43;
-	STRB R3, [R0], #4;
-	
-	MOV R3, #13;
-	STRB R3, [R0], #4;
-	
-	MOV R3, #211;
-	STRB R3, [R0], #4;
-	
-	MOV R3, #3;
-	STRB R3, [R0], #4;
-	
-	MOV R3, #203;
-	STRB R3, [R0], #4;
-	
-	MOV R3, #5;
-	STRB R3, [R0], #4;
-	
-	MOV R3, #21;
-	STRB R3, [R0], #4;
-	
-	MOV R3, #7;
-	STRB R3, [R0], #4;
-	
-	MOV R3, #206;
-	STRB R3, [R0], #4;
-	
-	MOV R3, #245;
-	STRB R3, [R0], #4;
-	
-	MOV R3, #157;
-	STRB R3, [R0], #4;
-	
-	MOV R3, #237;
-	STRB R3, [R0], #4;
-	
-	MOV R3, #241;
-	STRB R3, [R0], #4;
-	
-	MOV R3, #105;
-	STRB R3, [R0], #4;
-	
-	MOV R3, #252;
-	STRB R3, [R0], #4;
-	
-	MOV R3, #19;
-	STRB R3, [R0], #4;
 	
 find_primes
 	LDR R0, =RANDOM_LIST;
@@ -110,7 +60,7 @@ find_primes
 	MOV R9,#0;
 	
 check_prime_loop
-	LDRB R5, [R0], #4;
+	LDRB R5, [R0], #1;
 	;B next_num
 	
 	
@@ -127,8 +77,8 @@ check_prime
 	IT LT
 		BLT check_prime
 		
-	;;Numero È primo: salvar na lista
-	STRB R5, [R1], #4;
+	;;Numero √© primo: salvar na lista
+	STRB R5, [R1], #1;
 	ADD R4, R4, #1; ;Numero de primos
 	
 next_num
@@ -139,7 +89,7 @@ next_num
 
 ; Bubble Sort
 bubble_sort
-    LDR R0, =PRIME_LIST; ;primeira posiÁ„o do array
+    LDR R0, =PRIME_LIST; ;primeira posi√ß√£o do array
     SUB R4, R4, #1; ;decrementa 1 do tamanho do array
 
 main_loop
@@ -148,12 +98,12 @@ main_loop
     
 loop
     LDRB R2, [R0]; ; valor atual
-    LDRB R3, [R0, #4]; ;prÛximo valor
+    LDRB R3, [R0, #1]; ;pr√≥ximo valor
     CMP R2, R3;
     IT GT
         BGT swap;
 
-    ADD R0, R0, #4; ; avanÁa na lista
+    ADD R0, R0, #1; ; avan√ßa na lista
     ADD R5, R5, #1;
     CMP R5, R4;
     BLT loop;
@@ -165,7 +115,7 @@ loop
     B main_loop; 
 
 swap
-    STRB R2, [R0, #4]; ; Trocar os valores
+    STRB R2, [R0, #1]; ; Trocar os valores
     STRB R3, [R0];
     MOV R10, #1; ; Sinalizar que houve troca
 	B loop;
@@ -173,6 +123,9 @@ swap
 SORTED
 	
 	NOP;
-	
-	ALIGN                           ; garante que o fim da seÁ„o est· alinhada 
+
+
+array1 DCB 193, 63, 176, 127, 43, 13, 211, 3, 203, 5, 21, 7, 206, 245, 157, 237, 241, 105, 252, 19, 0;
+
+	ALIGN                           ; garante que o fim da se√ß√£o est√° alinhada 
     END                             ; fim do arquivo
